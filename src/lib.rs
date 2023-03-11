@@ -26,24 +26,27 @@ impl System<State> for Orbit {
     }
 }
 
-fn integrate() -> Vec<Vector6<f64>> {
+fn integrate(state_vector: Vector6<f64>) -> Vec<Vector6<f64>> {
     let system = Orbit { mu: 1.327e11 }; // mu km-3/s-2
 
     let rtol: f64 = 1e-6;
     let atol: f64 = 1e-8;
-    let y0 = State::new(
-        -131386230.977293,
-        69971484.9501445,
-        -718889.822774674,
-        -1.745306e+01,
-        -2.843202e+01,
-        -6.151334e-01,
-    );
+
     let time_start = 0.0;
     let time_of_flight: f64 = 6.189400 * 86400.0;
 
-    let mut stepper = Dopri5::new(system, time_start, time_of_flight, 10.0, y0, rtol, atol);
-    stepper.integrate().expect("TODO: panic message");
+    let mut stepper = Dopri5::new(
+        system,
+        time_start,
+        time_of_flight,
+        10.0,
+        state_vector,
+        rtol,
+        atol,
+    );
+    stepper
+        .integrate()
+        .expect("ERROR: Unable to integrate provided parameters.");
 
     let y_out = stepper.y_out();
     y_out.to_vec()
@@ -56,7 +59,15 @@ mod tests {
 
     #[test]
     fn should_integrate() {
-        let result = integrate();
+        let y0 = State::new(
+            -131386230.977293,
+            69971484.9501445,
+            -718889.822774674,
+            -1.745306e+01,
+            -2.843202e+01,
+            -6.151334e-01,
+        );
+        let result = integrate(y0);
         let final_value = result.last().unwrap();
 
         // Position Vectors
