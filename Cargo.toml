@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 ode_solvers = "0.3.7"
+
+[dev-dependencies]
+parameterized = "1.0.1"
